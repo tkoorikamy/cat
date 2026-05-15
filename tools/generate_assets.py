@@ -1,4 +1,5 @@
 from pathlib import Path
+import argparse
 from PIL import Image, ImageDraw
 
 ASSETS_DIR = Path(__file__).resolve().parents[1] / "assets"
@@ -38,7 +39,7 @@ def cat_base(eye="open", paw="down", toy=False, sleep=False, tail=0):
     return img
 
 
-def save_set():
+def save_set(make_ico: bool = False):
     cat_base(eye="open", paw="down", tail=0).save(ASSETS_DIR / "cat_idle_0.png")
     cat_base(eye="blink", paw="down", tail=4).save(ASSETS_DIR / "cat_idle_1.png")
     cat_base(eye="open", paw="down", tail=8).save(ASSETS_DIR / "cat_idle_2.png")
@@ -56,9 +57,15 @@ def save_set():
 
     icon = Image.new("RGBA", (256, 256), (0, 0, 0, 0))
     icon.alpha_composite(cat_base().resize((256, 256)))
-    icon.save(ASSETS_DIR / "tray_icon.png")
+    tray_png = ASSETS_DIR / "tray_icon.png"
+    icon.save(tray_png)
+    if make_ico:
+        icon.save(ASSETS_DIR / "tray_icon.ico", format="ICO", sizes=[(16, 16), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)])
 
 
 if __name__ == "__main__":
-    save_set()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--ico", action="store_true", help="Also generate tray_icon.ico")
+    args = parser.parse_args()
+    save_set(make_ico=args.ico)
     print("Assets generated in", ASSETS_DIR)
